@@ -1,0 +1,557 @@
+-- Active: 1732044196726@@127.0.0.1@5432@universidad@ingenieria
+CREATE TABLE Asignaturas (
+    cod_a SERIAL PRIMARY KEY,       -- Código único de la asignatura, clave primaria
+    nom_a VARCHAR(100) NOT NULL,    -- Nombre de la asignatura
+    int_h INT NOT NULL,             -- Intensidad horaria de la asignatura (horas)
+    creditos INT NOT NULL           -- Créditos de la asignatura
+);
+
+DROP TABLE Asignaturas;
+
+
+CREATE TABLE Profesores (
+    id_p SERIAL PRIMARY KEY,        -- Identificador único del profesor, clave primaria
+    nom_p VARCHAR(100) NOT NULL,    -- Nombre del profesor
+    dir_p VARCHAR(255),             -- Dirección del profesor
+    tel_p INTEGER,                  -- Teléfono del profesor
+    profesion VARCHAR(100)          -- Profesión del profesor
+);
+CREATE TABLE Referencia (
+    cod_a INT,                      -- Código de la asignatura (clave foránea)
+    isbn VARCHAR(20),               -- ISBN del libro (clave foránea)
+    PRIMARY KEY (cod_a, isbn),      -- Clave primaria compuesta
+    CONSTRAINT fk_referencia_cod_a FOREIGN KEY (cod_a) REFERENCES Asignaturas(cod_a),
+    CONSTRAINT fk_referencia_isbn FOREIGN KEY (isbn) REFERENCES biblioteca.Libros(isbn)
+);
+CREATE TABLE Imparte (
+    id_p INT,                      -- ID del profesor (clave foránea)
+    cod_a INT,                     -- Código de la asignatura (clave foránea)
+    grupo VARCHAR(20) NOT NULL,    -- Grupo al que se imparte la asignatura
+    horario VARCHAR(100),          -- Horario de la asignatura
+    PRIMARY KEY (id_p, cod_a, grupo), -- Clave primaria compuesta
+    CONSTRAINT fk_imparte_id_p FOREIGN KEY (id_p) REFERENCES Profesores(id_p),
+    CONSTRAINT fk_imparte_cod_a FOREIGN KEY (cod_a) REFERENCES Asignaturas(cod_a)
+);
+
+CREATE TABLE Inscribe (
+    cod_e INT,                      -- Código del estudiante (clave foránea)
+    cod_a INT,                      -- Código de la asignatura (clave foránea)
+    id_p INT,                       -- ID del profesor (clave foránea)
+    grupo VARCHAR(20) NOT NULL,     -- Grupo al que pertenece
+    n1 NUMERIC(5,2),                -- Nota 1
+    n2 NUMERIC(5,2),                -- Nota 2
+    n3 NUMERIC(5,2),                -- Nota 3
+    PRIMARY KEY (cod_e, cod_a, id_p, grupo), -- Clave primaria compuesta
+    CONSTRAINT fk_inscribe_cod_a FOREIGN KEY (cod_a) REFERENCES Asignaturas(cod_a),
+    CONSTRAINT fk_inscribe_id_p FOREIGN KEY (id_p) REFERENCES Profesores(id_p),
+    CONSTRAINT fk_inscribe_cod_e_sistemas FOREIGN KEY (cod_e) REFERENCES "ingenieria sistemas".estudiantes(cod_e),
+    CONSTRAINT fk_inscribe_cod_e_ambiental FOREIGN KEY (cod_e) REFERENCES "ingenieria ambiental".estudiantes(cod_e),
+    CONSTRAINT fk_inscribe_cod_e_electronica FOREIGN KEY (cod_e) REFERENCES "ingenieria electronica".estudiantes(cod_e),
+    CONSTRAINT fk_inscribe_cod_e_industrial FOREIGN KEY (cod_e) REFERENCES "ingenieria industrial".estudiantes(cod_e)
+);
+
+INSERT INTO ing_carreras (cod_car, nom_car) VALUES
+(10001, 'Ingenieria de Sistemas'),
+(10002, 'Ingenieria Mecanica'),
+(10003, 'Ingenieria Electronica'),
+(10004, 'Ingenieria Ambiental'),
+(10005, 'Ingenieria Industrial');
+
+INSERT INTO asignaturas (cod_a, nom_a, int_h, creditos) VALUES
+(1001, 'Calculo 1', 4, 4),
+(1002, 'Calculo 2', 4, 4),
+(1003, 'Diseño de Bases de Datos', 5, 4),
+(1004, 'Ingenieria de Software', 4, 3),
+(4002, 'Sistemas de Informacion Geografica', 4, 4),
+(4001, 'Cartografia', 4, 3),
+(2001, 'Termodinamica', 4, 3),
+(2002, 'Resistencia de Materiales', 4, 4),
+(2003, 'Neumatica', 3, 3),
+(3001, 'Circuitos logicos', 4, 4),
+(3002, 'Digitales', 5, 4),
+(2005, 'Procesos Industriales', 4, 4);
+
+INSERT INTO profesores (id_p, nom_p, profesion, tel_p) VALUES
+(11001, 'Profesor 1', 'Profesion 1', 911001),
+(11002, 'Profesor 2', 'Profesion 2', 911002),
+(11003, 'Profesor 3', 'Profesion 3', 911003),
+(11004, 'Profesor 4', 'Profesion 4', 911004),
+(11005, 'Profesor 5', 'Profesion 2', 911005),
+(11006, 'Profesor 6', 'Profesion 3', 911006),
+(11007, 'Profesor 7', 'Profesion 4', 911007),
+(11008, 'Profesor 8', 'Profesion 2', 911008);
+
+INSERT INTO referencia (cod_a, isbn) VALUES
+(1001, '100100100'),
+(1001, '100100200'),
+(1002, '100100200'),
+(1002, '100100300'),
+(1003, '100100300'),
+(1003, '100100400'),
+(1004, '100100500'),
+(1004, '100100300'),
+(2005, '100100400'),
+(2005, '100100500'),
+(4002, '100100800'),
+(4001, '100100900'),
+(2001, '100110100'),
+(2001, '100110400'),
+(2003, '100150100'),
+(3001, '100200600'),
+(3002, '100170300'),
+(3002, '100180400'),
+(2005, '100210700'),
+(2005, '100190500'),
+(2001, '100100900'),
+(2001, '100120500'),
+(2003, '100100900'),
+(3001, '100100900');
+
+INSERT INTO imparte (id_p, cod_a, grupo, horario) VALUES
+(11001, 1001, 1, 'L-8-10 J-10-12'),
+(11001, 1001, 2, 'L-10-12 J-8-10'),
+(11001, 1001, 3, 'L-8-10 J-10-12'),
+(11002, 1001, 4, 'L-10-12 J-8-10'),
+(11001, 1002, 1, 'M-8-10 V-10-12'),
+(11002, 1002, 2, 'M-10-12 V-8-10'),
+(11003, 1003, 1, 'L-8-10 R-10-12 V-9-10'),
+(11004, 1004, 2, 'M-7-9 V-8-10');
+
+INSERT INTO Inscribe (cod_e, cod_a, id_p, grupo, n1, n2, n3) VALUES
+(200001, 1002, 11001, '1', 4.3, 2.5, 3.0),
+(200001, 1003, 11003, '1', 3.5, 2.5, 2.3),
+(2000018, 1003, 11003, '1', 3.0, 2.0, 2.0),
+(200008, 1004, 11004, '2', 4.0, 1.0, 2.0),
+(200008, 1001, 11001, '2', 5.0, 2.5, 3.0),
+(2000017, 1004, 11004, '2', 4.0, 3.0, 2.0),
+(2000018, 1004, 11004, '2', 4.0, 3.0, 1.0),
+(200007, 1001, 11001, '1', 4.0, 4.0, 4.5),
+(2000019, 1001, 11001, '1', 3.0, 2.5, 3.0),
+(2000021, 1003, 11003, '1', 5.0, 3.2, 2.0),
+(2000021, 1004, 11004, '2', 2.0, 3.0, 5.0);
+
+CREATE VIEW todos_estudiantes AS
+SELECT cod_e, nom_e, dir_e, tel_e, f_nac, cod_car, 'ingenieria sistemas' AS carrera
+FROM "ingenieria sistemas".estudiantes
+UNION
+SELECT cod_e, nom_e, dir_e, tel_e, f_nac, cod_car, 'ingenieria ambiental' AS carrera
+FROM "ingenieria ambiental".estudiantes
+UNION
+SELECT cod_e, nom_e, dir_e, tel_e, f_nac, cod_car, 'ingenieria electronica' AS carrera
+FROM "ingenieria electronica".estudiantes
+UNION
+SELECT cod_e, nom_e, dir_e, tel_e, f_nac, cod_car, 'ingenieria industrial' AS carrera
+FROM "ingenieria industrial".estudiantes;
+
+
+
+
+
+INSERT INTO Inscribe (cod_e, cod_a, id_p, grupo, n1, n2, n3) VALUES
+-- Estudiantes de Ingeniería Sistemas
+(200001, 1002, 11001, '1', 4.3, 2.5, 3.0),
+(200001, 1003, 11003, '1', 3.5, 2.5, 2.3),
+(200008, 1003, 11003, '1', 3.0, 2.0, 2.0),
+(200008, 1004, 11004, '2', 4.0, 1.0, 2.0),
+(200008, 1001, 11001, '2', 5.0, 2.5, 3.0),
+(200001, 1004, 11004, '2', 4.0, 3.0, 2.0),
+-- Estudiantes de Ingeniería Ambiental
+(2000017, 1001, 11001, '1', 4.0, 4.0, 4.5),
+(2000018, 1004, 11004, '2', 4.0, 3.0, 1.0),
+(2000018, 1001, 11001, '1', 4.0, 4.0, 4.5),
+-- Estudiantes de Ingeniería Industrial
+(2000021, 1001, 11001, '1', 3.0, 2.5, 3.0),
+(2000021, 1003, 11003, '1', 5.0, 3.2, 2.0),
+(2000021, 1004, 11004, '2', 2.0, 3.0, 5.0),
+-- Estudiantes de Ingeniería Electrónica
+(2000014, 1003, 11003, '1', 3.5, 5.0, 5.0),
+(2000015, 1004, 11004, '2', 4.0, 3.0, 2.0);
+
+
+
+
+
+create view info_profesores as 
+select *
+from profesores
+where id_p::text=current_user;
+
+SELECT * FROM info_profesores;
+
+create view lista_estudiantes as
+select cod_a, nom_a, grupo, cod_e, nom_e, n1, n2, n3, 
+(COALESCE(n1,0)*.35+COALESCE(n2,0)*.35+COALESCE(n3,0)*.3)::real as definitiva
+from todos_estudiantes natural join inscribe natural join asignaturas
+where id_p::TEXT = current_user
+order by cod_a, grupo, cod_e;
+
+CREATE VIEW listado_facultad_asig AS
+SELECT cod_a, nom_a, grupo, cod_e, nom_e FROM todos_estudiantes natural join ingenieria.inscribe natural join ingenieria.asignaturas
+ORDER BY cod_a,nom_a,grupo;
+
+create role estudiantesIng;
+grant usage on schema ingenieria to estudiantesIng;
+grant select on ingenieria.notasEstud to estudiantesIng;
+
+create role profesoresIng;
+grant usage on schema ingenieria to profesoresIng; 
+grant select, update (profesion, nom_p, dir_p, tel_p) on ingenieria.info_profesores to profesoresIng;
+
+CREATE OR REPLACE FUNCTION crear_usuarios() RETURNS void AS
+$BODY$
+DECLARE f ingenieria.todos_estudiantes%rowtype;
+DECLARE r ingenieria.profesores%rowtype;
+BEGIN
+	FOR f IN SELECT * FROM ingenieria.todos_estudiantes
+	LOOP
+		if (f.cod_e::text not in (select usename from pg_user)) then
+			execute 'create user "'||f.cod_e||'" with password '||''''||f.cod_e||'''';
+			execute 'grant estudiantesIng to "'||f.cod_e||'"'; 
+		end if;
+	END LOOP;
+	FOR r IN SELECT * FROM ingenieria.profesores
+	LOOP
+		if (r.id_p::text not in (select usename from pg_user)) then
+			execute 'create user "'||r.id_p||'" with password '||''''||r.id_p||'''';
+			execute 'grant profesoresIng to "'||r.id_p||'"'; 
+		end if;
+	END LOOP;
+RETURN;
+END
+$BODY$
+LANGUAGE 'plpgsql' ;
+
+create or replace function update_est() returns trigger as $update_est$
+declare
+begin
+  update ingenieria.inscribe set 
+  n1 = NEW.n1, n2 = NEW.n2, n3 = NEW.n3 
+  where cod_e = OLD.cod_e and cod_a = OLD.cod_a and cod_e in (select cod_e from ingenieria.lista_estudiantes where id_p::text = current_user);
+  RETURN NEW;
+end;
+$update_est$
+language plpgsql;
+
+create trigger update_est_trg
+instead of update on lista_estudiantes
+for each row execute procedure update_est();
+
+CREATE OR REPLACE FUNCTION insert_inscribe() RETURNS
+TRIGGER AS $insert_inscribe$
+BEGIN
+	IF (new.cod_e in (select cod_e from ingenieria.estudiantes_fac)) THEN
+		RETURN NEW;
+	ELSE 
+		RETURN NULL;
+	END IF;
+END;
+$insert_inscribe$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_inscribe_trg BEFORE
+UPDATE OR INSERT
+ON inscribe FOR EACH row
+EXECUTE PROCEDURE insert_inscribe();
+		
+  
+  SET SESSION AUTHORIZATION '200001';
+  SELECT SESSION_USER, CURRENT_USER;
+
+  SELECT * FROM biblioteca.libros;
+  SELECT * FROM ingenieria.notasestud;
+
+  SET SESSION AUTHORIZATION 'postgres';
+  select * from ingenieria.prestamos_universidad;
+
+  SET SESSION AUTHORIZATION 'bibliotecau';
+
+  SELECT * FROM biblioteca.presta;
+
+  SET SESSION AUTHORIZATION '11001';
+  SELECT SESSION_USER, CURRENT_USER;
+SELECT * FROM biblioteca.libros;
+SELECT * FROM ingenieria.info_profesores;
+
+SELECT * FROM ingenieria.lista_estudiantes;
+
+GRANT SELECT ON lista_estudiantes TO profesoresIng;
+
+GRANT SELECT ON TABLE inscribe TO estudiantesIng;
+GRANT SELECT ON TABLE biblioteca.autores TO estudiantesIng;
+GRANT SELECT ON TABLE biblioteca.libros TO estudiantesIng;
+GRANT INSERT, UPDATE ON TABLE biblioteca.presta TO estudiantesIng;
+GRANT SELECT, UPDATE ON TABLE inscribe TO profesoresIng;
+GRANT SELECT ON TABLE biblioteca.autores TO profesoresIng;
+GRANT SELECT ON TABLE biblioteca.libros TO profesoresIng;
+GRANT SELECT ON TABLE biblioteca.escribe TO profesoresIng;
+
+SELECT * FROM ingenieria.lista_estudiantes;
+SELECT * FROM biblioteca.libros;
+SELECT * FROM ingenieria.info_profesores;
+UPDATE ingenieria.info_profesores SET nom_p = 'profesor1' where current_user = id_p::text;
+
+SELECT * from ingenieria.todos_estudiantes
+
+GRANT UPDATE ON TABLE inscribe TO profesoresIng;
+
+-- es una restriccion para que el profesor solo pueda actualizar las notas de sus estudiantes
+CREATE POLICY actualizar_notas
+ON inscribe
+FOR UPDATE
+USING (id_p = current_user::INTEGER);
+
+CREATE VIEW inscribe_profesor AS
+SELECT *
+FROM inscribe
+WHERE id_p = current_user::INTEGER;
+
+
+
+
+
+CREATE  VIEW notasEstud AS
+SELECT
+    e.cod_e AS codigo_estudiante,
+    e.nom_e AS nombre_estudiante,
+    a.cod_a AS codigo_asignatura,
+    a.nom_a AS nombre_asignatura,
+    i.grupo AS grupo,
+    i.n1 AS nota1,
+    i.n2 AS nota2,
+    i.n3 AS nota3,
+    ROUND((i.n1 + i.n2 + i.n3) / 3.0, 2) AS promedio_notas
+FROM 
+    inscribe i
+JOIN asignaturas a ON i.cod_a = a.cod_a
+JOIN "ingenieria sistemas".estudiantes e ON i.cod_e = e.cod_e
+WHERE e.cod_e = CURRENT_USER::INTEGER
+UNION ALL
+SELECT
+    e.cod_e AS codigo_estudiante,
+    e.nom_e AS nombre_estudiante,
+    a.cod_a AS codigo_asignatura,
+    a.nom_a AS nombre_asignatura,
+    i.grupo AS grupo,
+    i.n1 AS nota1,
+    i.n2 AS nota2,
+    i.n3 AS nota3,
+    ROUND((i.n1 + i.n2 + i.n3) / 3.0, 2) AS promedio_notas
+FROM 
+    inscribe i
+JOIN asignaturas a ON i.cod_a = a.cod_a
+JOIN "ingenieria ambiental".estudiantes e ON i.cod_e = e.cod_e
+WHERE e.cod_e = CURRENT_USER::INTEGER;
+
+
+
+
+drop View notasestud
+
+
+----------------------------- biblioteca ---------------------------------------------------------
+
+-- Active: 1732044196726@@127.0.0.1@5432@universidad@biblioteca
+CREATE TABLE Autores (
+    id_a SERIAL PRIMARY KEY,        -- Identificador único del autor, clave primaria
+    nom_autor VARCHAR(100) NOT NULL, -- Nombre del autor
+    nacionalidad VARCHAR(50)        -- Nacionalidad del autor
+);
+
+CREATE TABLE Libros (
+    isbn VARCHAR(20) PRIMARY KEY,    -- ISBN como identificador único (clave primaria)
+    titulo VARCHAR(200) NOT NULL,   -- Título del libro
+    edicion INTEGER,                -- Edición del libro
+    editorial VARCHAR(100)          -- Editorial del libro
+);
+CREATE TABLE Escribe (
+    isbn VARCHAR(20),                -- ISBN del libro (clave foránea)
+    id_a INT,                        -- ID del autor (clave foránea)
+    PRIMARY KEY (isbn, id_a),        -- Clave primaria compuesta
+    CONSTRAINT fk_escribe_isbn FOREIGN KEY (isbn) REFERENCES Libros(isbn),
+    CONSTRAINT fk_escribe_id_a FOREIGN KEY (id_a) REFERENCES Autores(id_a)
+);
+
+CREATE TABLE Ejemplares (
+    isbn VARCHAR(20),                -- ISBN del libro (clave foránea)
+    num_e INT,                       -- Número de ejemplar
+    PRIMARY KEY (isbn, num_e),       -- Clave primaria compuesta
+    CONSTRAINT fk_ejemplares_isbn FOREIGN KEY (isbn) REFERENCES Libros(isbn)
+);
+
+CREATE TABLE Presta (
+    cod_e INT,                      -- Código del estudiante (clave foránea)
+    isbn VARCHAR(20),               -- ISBN del libro (clave foránea)
+    num_e INT,                      -- Número de ejemplar (clave foránea)
+    fech_p DATE NOT NULL,           -- Fecha del préstamo
+    fech_d DATE,                    -- Fecha de devolución
+    PRIMARY KEY (cod_e, isbn, num_e, fech_p), -- Clave primaria compuesta
+    CONSTRAINT fk_presta_isbn FOREIGN KEY (isbn) REFERENCES biblioteca.Libros(isbn),
+    CONSTRAINT fk_presta_num_e FOREIGN KEY (isbn, num_e) REFERENCES Ejemplares(isbn, num_e),
+    CONSTRAINT fk_presta_cod_e_sistemas FOREIGN KEY (cod_e) REFERENCES "ingenieria sistemas".Estudiantes(cod_e),
+    CONSTRAINT fk_presta_cod_e_ambiental FOREIGN KEY (cod_e) REFERENCES "ingenieria ambiental".Estudiantes(cod_e),
+    CONSTRAINT fk_presta_cod_e_electronica FOREIGN KEY (cod_e) REFERENCES "ingenieria electronica".Estudiantes(cod_e),
+    CONSTRAINT fk_presta_cod_e_industrial FOREIGN KEY (cod_e) REFERENCES "ingenieria industrial".Estudiantes(cod_e)
+);
+
+
+INSERT INTO autores (id_a, nom_autor, nacionalidad) VALUES
+(1111, 'Autor 1', 'Colombiana'),
+(1112, 'Autor 2', 'Argentina'),
+(1113, 'Autor 3', 'Mexicana'),
+(1114, 'Autor 4', 'Española'),
+(1115, 'Autor 5', 'Chilena'),
+(1116, 'Autor 6', 'Peruana'),
+(1117, 'Autor 7', 'Brasileña'),
+(1118, 'Autor 8', 'Venezolana'),
+(1119, 'Autor 9', 'Uruguaya'),
+(1010, 'Autor 10', 'Ecuatoriana'),
+(1011, 'Autor 11', 'Paraguaya'),
+(1012, 'Autor 12', 'Boliviana'),
+(1013, 'Autor 13', 'Cubana'),
+(1014, 'Autor 14', 'Dominicana'),
+(1015, 'Autor 15', 'Panameña'),
+(1016, 'Autor 16', 'Costarricense');
+
+INSERT INTO libros (isbn, titulo, edicion) VALUES
+(100100100, 'Libro 1', 1),
+(100100200, 'Libro 2', 1),
+(100100300, 'Libro 3', 1),
+(100100400, 'Libro 4', 1),
+(100100500, 'Libro 5', 1),
+(100100600, 'Libro 6', 1),
+(100100700, 'Libro 7', 1),
+(100100800, 'Libro 8', 1),
+(100100900, 'Libro 9', 1),
+(100110100, 'Libro 10', 1),
+(100110400, 'Libro 11', 1),
+(100120500, 'Libro 12', 1),
+(100130600, 'Libro 13', 1),
+(100140700, 'Libro 14', 1),
+(100150100, 'Libro 15', 1),
+(100160200, 'Libro 16', 1),
+(100170300, 'Libro 17', 1),
+(100180400, 'Libro 18', 1),
+(100190500, 'Libro 19', 1),
+(100200600, 'Libro 20', 1),
+(100210700, 'Libro 21', 1);
+
+INSERT INTO ejemplares (num_e, isbn) VALUES
+(1, '100100100'),
+(2, '100100100'),
+(3, '100100100'),
+(1, '100100200'),
+(2, '100100200'),
+(1, '100100300'),
+(1, '100100400'),
+(2, '100100400'),
+(1, '100100500'),
+(1, '100100600'),
+(1, '100100700'),
+(2, '100100700'),
+(3, '100100700'),
+(1, '100100800'),
+(2, '100100800'),
+(1, '100100900'),
+(1, '100110100'),
+(2, '100110100'),
+(3, '100110100'),
+(1, '100120500'),
+(1, '100130600'),
+(1, '100140700'),
+(2, '100140700'),
+(3, '100140700'),
+(1, '100150100'),
+(1, '100160200'),
+(1, '100170300'),
+(2, '100170300'),
+(3, '100170300'),
+(4, '100170300'),
+(1, '100180400'),
+(1, '100190500'),
+(2, '100190500'),
+(3, '100190500'),
+(1, '100200600'),
+(2, '100200600'),
+(3, '100200600'),
+(1, '100210700'),
+(2, '100210700'),
+(3, '100210700'),
+(4, '100210700'),
+(5, '100210700');
+
+INSERT INTO escribe (isbn, id_a) VALUES
+('100100100', 1016),
+('100100100', 1111),
+('100100200', 1016),
+('100100300', 1010),
+('100100400', 1012),
+('100100400', 1014),
+('100100400', 1015),
+('100100500', 1118),
+('100100600', 1014),
+('100100700', 1119),
+('100100700', 1113),
+('100100800', 1010),
+('100100900', 1012),
+('100100900', 1011),
+('100110100', 1118),
+('100110100', 1016),
+('100110400', 1118),
+('100120500', 1116),
+('100160200', 1112),
+('100180400', 1113),
+('100170300', 1011),
+('100190500', 1112),
+('100160200', 1011),
+('100100200', 1113),
+('100140700', 1115),
+('100200600', 1118),
+('100210700', 1117);
+
+INSERT INTO presta (cod_e, isbn, num_e, fech_p, fech_d) VALUES
+(200001, '100100100', 2, '2014-07-01', NULL),
+(200001, '100140700', 2, '2014-06-01', '2014-06-10'),
+(200001, '100100800', 1, '2014-06-15', '2014-06-20'),
+(200008, '100190500', 1, '2014-04-01', NULL),
+(2000021, '100160200', 1, '2014-06-01', '2014-06-15'),
+(200008, '100170300', 3, '2014-06-15', NULL),
+(200001, '100100100', 2, '2015-02-01', NULL),
+(200008, '100190500', 1, '2014-10-01', NULL);
+
+
+
+
+
+
+CREATE VIEW consulta_escribe AS
+SELECT * from autores natural join libros natural join escribe
+ORDER BY id_a,isbn;
+
+create user bibliotecau with password 'bibliotecau';
+grant usage on schema biblioteca to bibliotecau;
+grant usage on schema ingenieria to bibliotecau;
+
+GRANT SELECT ON ingenieria.todos_estudiantes TO bibliotecau;
+GRANT SELECT ON biblioteca.presta TO bibliotecau;
+
+GRANT USAGE ON SCHEMA biblioteca to profesoresIng;
+GRANT SELECT ON biblioteca.autores TO profesoresIng;
+GRANT SELECT ON biblioteca.libros TO profesoresIng;
+
+GRANT USAGE ON SCHEMA biblioteca to estudiantesIng;
+GRANT SELECT ON biblioteca.autores TO estudiantesIng;
+
+CREATE ROLE bibliotecario WITH LOGIN PASSWORD 'tu_password';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE biblioteca.presta TO bibliotecario;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE biblioteca.libros TO bibliotecario;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE biblioteca.ejemplares TO bibliotecario;
+GRANT SELECT, INSERT ON TABLE biblioteca.escribe TO bibliotecario;
+
+GRANT USAGE ON SCHEMA biblioteca TO bibliotecario;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA biblioteca TO bibliotecario;
+
+GRANT SELECT, INSERT ON TABLE biblioteca.presta TO bibliotecario;
+
+REVOKE DELETE, UPDATE ON TABLE biblioteca.presta FROM bibliotecario;
+
+
