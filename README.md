@@ -1,6 +1,6 @@
 # db_final
 
-Manuel Leon
-jesus oliveros
-fernando rincon
+Manuel Leon,
+jesus oliveros,
+fernando rincon,
 sebastian caycedo
